@@ -5,7 +5,7 @@ import json
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import generic
 from django.conf import settings
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Item
@@ -21,6 +21,13 @@ class ItemDetailView(generic.DetailView):
     model = Item
     template_name = 'test_stripe/item_detail_view.html'
     pk_url_kwarg = 'id'
+
+
+class ItemCreaeteView(generic.CreateView):
+    model = Item
+    fields = '__all__'
+    template_name = 'test_stripe/item_create_view.html'
+    success_url = reverse_lazy('home')
 
 
 class CreateCheckoutSessionView(generic.TemplateView):
