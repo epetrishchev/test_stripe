@@ -1,0 +1,21 @@
+{% extends 'test_stripe/base.html' %}
+{% load static %}
+{% block content %}
+{% if item_list %}
+<div class="row row-cols-1 row-cols-md-3 g-4">
+  {% for item in item_list %}
+  <div class="col">
+    <div class="card h-100">
+      <img src="..." class="card-img-top" alt="image">
+      <div class="card-body">
+        <h5 class="card-title">{{ item.name }}</h5>
+        <h6 class="card-title">{{item.price}}</h6>
+        <a href="{% url 'item' id=item.id %}" class="btn btn-primary">Details</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <h5 class="card-title">Товары отсутствуют</h5>
+{% endif %}
+{% endblock content %}
