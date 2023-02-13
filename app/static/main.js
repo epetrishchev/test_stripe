@@ -1,6 +1,3 @@
-console.log('Check script!')
-
-
 // Get Stripe publishable key
 fetch("/config/")
     .then((result) => { return result.json(); })
