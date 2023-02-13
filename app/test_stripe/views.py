@@ -8,6 +8,8 @@ from django.conf import settings
 from django.urls import reverse, reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 
+from .utils.stripe_api import create_checkout_session_for_item, get_stripe_config
+
 from .models import Item
 
 
@@ -33,64 +35,14 @@ class ItemCreaeteView(generic.CreateView):
 class CreateCheckoutSessionView(generic.TemplateView):
     def get(self, request, *args, **kwargs):
         item = Item.objects.get(id=self.kwargs["id"])
-        domain = 'http://epetrishchev.pythonanywhere.com/'
-        stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
-        if settings.DEBUG:
-            domain = 'http://127.0.0.1:8000'
-        checkout_session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[
-                {
-                    'price_data': {
-                        'currency': 'usd',
-                        'product_data': {
-                            'name': item.name,
-                        },
-                        'unit_amount': int(item.price * 100),
-                    },
-                    'quantity': 1,
-                }
-            ],
-            mode='payment',
-            success_url=request.build_absolute_uri(
-                reverse('succes')) + "?session_id={CHECKOUT_SESSION_ID}"
-        )
+        checkout_session = create_checkout_session_for_item(item, request)
         return JsonResponse(checkout_session)
-
-
-@csrf_exempt
-def create_checkout_session(request, id):
-    item = get_object_or_404(Item, pk=id)
-
-    stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
-
-    checkout_session = stripe.checkout.Session.create(
-        payment_method_types=['card'],
-        line_items=[
-            {
-                'price_data': {
-                    'currency': 'usd',
-                    'product_data': {
-                        'name': item.name,
-                    },
-                    'unit_amount': int(item.price * 100),
-                },
-                'quantity': 1,
-            }
-        ],
-        mode='payment',
-        success_url=request.build_absolute_uri(
-            reverse('succes')) + "?session_id={CHECKOUT_SESSION_ID}",
-        cancel_url=request.build_absolute_uri(reverse('failed')),
-    )
-    print(JsonResponse({'sessionId': checkout_session['id']}))
-    return JsonResponse({'sessionId': checkout_session['id']})
 
 
 @csrf_exempt
 def stripe_config(request):
     if request.method == 'GET':
-        stripe_config = {'publicKey': settings.STRIPE_TEST_PUBLIC_KEY}
+        stripe_config = get_stripe_config()
         return JsonResponse(stripe_config, safe=False)
 
 
