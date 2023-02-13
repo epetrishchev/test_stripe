@@ -11,12 +11,15 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 import os
+import environ
 from pathlib import Path
 
+env = environ.Env(DEBUG=(bool, False))
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
+ROOT_DIR = environ.Path(__file__) - 3
+print('File', ROOT_DIR)
+environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -24,11 +27,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-0m(+^!i+i3pyqa-fn=_t-k#n0gmd!0oosdfcwfsph*et2f7q@m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = [
     'epetrishchev.pythonanywhere.com',
-    'http://127.0.0.1:8000',
+    '127.0.0.1',
 ]
 
 
@@ -130,9 +133,5 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-STRIPE_TEST_PUBLIC_KEY = os.environ.get(
-    "STRIPE_TEST_PUBLIC_KEY", "pk_test_51MZuFsKEaASB5wy6mlOlfOc1HuaW0eHDJPO1FDkYL5ZC6jTL7ZCPllO1tuBWPgvLsFi1eua81IQkYjTn8ZdMFr6o00e89UQilY")
-STRIPE_TEST_SECRET_KEY = os.environ.get(
-    "STRIPE_TEST_SECRET_KEY", "sk_test_51MZuFsKEaASB5wy6OlQafRrwSj3jp6xHcAPzwJGI5DL0wYWpawv4gNbOb3oKINgd94A7eYBU63beDTQpJPrmb0Ip00bPymChHV")
-STRIPE_PUBLIC_KEY = 'pk_test_51MZuFsKEaASB5wy6mlOlfOc1HuaW0eHDJPO1FDkYL5ZC6jTL7ZCPllO1tuBWPgvLsFi1eua81IQkYjTn8ZdMFr6o00e89UQilY'
-STRIPE_SECRET_KEY = 'sk_test_51MZuFsKEaASB5wy6OlQafRrwSj3jp6xHcAPzwJGI5DL0wYWpawv4gNbOb3oKINgd94A7eYBU63beDTQpJPrmb0Ip00bPymChHV'
+STRIPE_TEST_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
+STRIPE_TEST_SECRET_KEY = env('STRIPE_SECRET_KEY')
